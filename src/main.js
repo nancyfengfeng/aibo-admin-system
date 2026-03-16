@@ -1,15 +1,18 @@
 import { createApp } from 'vue'
-// import './style.css'
 import App from './App.vue'
 import router from './router'
-
+import { IconFont } from 'tdesign-icons-vue-next';
 import 'tdesign-vue-next/es/style/index.css';
 import './main.css'
 import '@/assets/theme.css'
 
+
 const app = createApp(App)
 
 app.use(router)
+app.component('IconFont', IconFont)
+// 全局提供
+app.provide('iconUrl', 'https://at.alicdn.com/t/c/font_5139612_fph9xv2il7f.css')
 
 app.mount('#app')
 

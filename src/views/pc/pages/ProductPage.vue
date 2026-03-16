@@ -1,41 +1,111 @@
 <template>
   <div>
 <!--    导航栏-->
-    <div class="text-s flex items-center w-full gap-1 text-slate-600 justify-start" >
-      <div class="flex items-center gap-1 ">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-3.5">
-          <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
-          <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
-        </svg>
-        <a class="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">首页</a>
-
+    <t-breadcrumb>
+      <t-breadcrumb-item to="/">
+        <template #icon>
+          <icon-font name="iconfont icon-shouye" :url="iconUrl" size="24"/>
+        </template>
+        首页
+      </t-breadcrumb-item>
+      <t-breadcrumb-item :disabled="true">
+        <template #icon>
+          <icon-font name="iconfont icon-shangpinku" :url="iconUrl" size="24"/>
+        </template>全部商品
+      </t-breadcrumb-item>
+    </t-breadcrumb>
+<!--    按钮栏-->
+    <div class="flex justify-between mt-5 ">
+      <div class="flex items-center">
+        <div class="text-base">全部商品</div>
+        <t-tooltip :content="tooltipContext">
+          <icon-font name="iconfont icon-info" :url="iconUrl" size="24"/>
+        </t-tooltip>
       </div>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-3.5">
-        <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd" />
-      </svg>
-      <div class="flex items-center gap-1 text-slate-500">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-3.5">
-          <path d="M2.25 2.25a.75.75 0 0 0 0 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 0 0-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 0 0 0-1.5H5.378A2.25 2.25 0 0 1 7.5 15h11.218a.75.75 0 0 0 .674-.421 60.358 60.358 0 0 0 2.96-7.228.75.75 0 0 0-.525-.965A60.864 60.864 0 0 0 5.68 4.509l-.232-.867A1.875 1.875 0 0 0 3.636 2.25H2.25ZM3.75 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM16.5 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" />
-        </svg>
-        全部商品
+      <div class="flex justify-end gap-2">
+        <t-button theme="primary">
+          <template #icon><add-icon /></template>
+          添加商品
+        </t-button>
+        <t-button variant="outline">
+          <template #icon>
+            <icon-font name="iconfont icon-cangku_kucunxiangqing" :url="iconUrl" size="24"/>
+          </template>
+          添加库存
+        </t-button>
       </div>
     </div>
-
-<!--    按钮栏-->
-<!--    1. 显示所有数量-->
-<!--    2. 按钮-->
+    <t-divider />
 <!--    筛选栏-->
+    <div class="flex justify-between">
+      <div class="flex gap-2">
+        <t-input placeholder="输入要搜索的商品名称" clearable v-model="searchName" :style="{ width: '250px' }">
+          <template #suffixIcon>
+            <search-icon :style="{ cursor: 'pointer' }" />
+          </template>
+        </t-input>
+        <t-input placeholder="输入商品编号，如 NG-081" clearable v-model="searchCode" :style="{ width: '250px' }">
+          <template #suffixIcon>
+            <search-icon :style="{ cursor: 'pointer' }" />
+          </template>
+        </t-input>
+        <t-select :style="{ width: '250px' }"
+                  v-model="selectedCategory"
+                  placeholder="请选择商品分类"
+                  clearable label="商品分类："
+        >
+          <t-option
+              v-for="item in categoryList"
+              :key="item._id"
+              :value="item._id"
+              :label="item.name"
+          />
+        </t-select>
+      </div>
+      <div>
+        <t-dropdown :options="dropdownOptions" trigger="click" @click="clickHandlerDropdown">
+          <t-button theme="default" shape="square" :style="{ width: '100px' }">
+            操作
+            <template #suffix> <t-icon name="chevron-down" size="16" /></template>
+          </t-button>
+        </t-dropdown>
+      </div>
+
+    </div>
 <!--    表格-->
+    <div class="mt-5">
+      <ProductTable />
+    </div>
 
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, h} from 'vue'
+import { inject } from 'vue'
+const iconUrl = inject('iconUrl')
+import { AddIcon,SearchIcon,Edit2Icon,BrowseIcon,Delete1Icon} from 'tdesign-icons-vue-next';
+import getCategoryList from "../../common/ProductPage/getCategoryList.js";
+import ProductTable from "../components/ProductTable.vue";
 
-onMounted(() => {
+const tooltipContext='显示 1-10 条，共 65,000 条'
 
+const searchName = ref('')
+const searchCode = ref('')
+
+const categoryList = ref([])        // 绑定到 t-select 的选项
+const selectedCategory = ref(null)  // 当前选择的值
+
+const dropdownOptions = [
+  { content: '编辑', value: 1, prefixIcon: () => h(Edit2Icon) },
+  { content: '删除', value: 3, prefixIcon: () => h(Delete1Icon) },
+]
+
+onMounted(async () => {
+  categoryList.value = await getCategoryList()
 })
+
+
 </script>
 
 <style scoped lang="scss">
