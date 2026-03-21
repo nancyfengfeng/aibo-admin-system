@@ -48,8 +48,5 @@ export default defineConfig({
       }
     })
   ],
-  base: '/aibo-admin-system/',
-  build: {
-    outDir: 'docs',
-  }
+  base: '/aibo-admin-system/'
 })
