@@ -48,7 +48,5 @@ export default defineConfig({
       }
     })
   ],
-  base: import.meta.env.MODE === 'production'
-      ? '/aibo-admin-system/'
-      : '/'
+  base: '/aibo-admin-system/'
 })
