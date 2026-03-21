@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { isMobile } from '@/utils/device'
 import { auth } from '@/utils/cloudbase'
 
