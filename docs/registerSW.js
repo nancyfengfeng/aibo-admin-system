@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/aibo-admin-system/sw.js', { scope: '/aibo-admin-system/' })})}

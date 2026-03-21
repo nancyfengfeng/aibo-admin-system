@@ -1,0 +1,1 @@
+import{x as n,E as o,D as r,B as t}from"./index-D9pMIDAV.js";const s={};function a(c,e){return t(),o("div",null,[...e[0]||(e[0]=[r("h1",null,"📱 AIBO 手机版首页",-1)])])}const f=n(s,[["render",a]]);export{f as default};
