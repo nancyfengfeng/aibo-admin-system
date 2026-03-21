@@ -26,7 +26,7 @@ export default defineConfig({
     AutoImport({
       resolvers: [
         TDesignResolver({ library: 'vue-next' }),
-        ElementPlusResolver()
+        ElementPlusResolver(),
       ],
     }),
     Components({

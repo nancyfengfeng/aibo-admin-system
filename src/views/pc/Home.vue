@@ -32,12 +32,6 @@
     <t-layout>
       <t-header class="header">
         <div class="header-left">
-          <t-icon
-              :name="isCollapsed ? 'chevron-right' : 'chevron-left'"
-              size="20"
-              @click="isCollapsed = !isCollapsed"
-              class="fold-btn"
-          />
           <t-breadcrumb :items="[{ name: '首页' }]" />
         </div>
 
@@ -74,7 +68,7 @@ const { logout, getNickname } = useLogin()
 const { menuList, activeMenu, handleMenuChange } = useMenu()
 
 const username = ref('')
-const isCollapsed = ref(false)
+const isCollapsed = ref(true)
 
 // 退出登录加载状态 ✅ 新加
 const logoutLoading = ref(false)

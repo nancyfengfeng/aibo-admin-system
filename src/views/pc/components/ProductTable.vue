@@ -167,7 +167,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import getProducts from "../../common/ProductPage/getProducts.js"
-import {Edit,Check} from '@element-plus/icons-vue'
+import {Check} from '@element-plus/icons-vue'
 
 const productData = ref([])
 const currentPageSize = ref(10)

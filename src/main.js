@@ -6,7 +6,6 @@ import 'tdesign-vue-next/es/style/index.css';
 import './main.css'
 import '@/assets/theme.css'
 
-
 const app = createApp(App)
 
 app.use(router)
