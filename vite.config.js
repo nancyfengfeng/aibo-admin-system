@@ -47,5 +47,6 @@ export default defineConfig({
         icons: [{ src: '/icon.png', sizes: '256x256', type: 'image/png' }]
       }
     })
-  ]
+  ],
+  base: '/aibo-admin-system/'
 })
