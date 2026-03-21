@@ -48,8 +48,5 @@ export default defineConfig({
       }
     })
   ],
-  base: '/aibo-admin-system/',
-  build: {
-    outDir: 'docs',
-  }
+  base: process.env.NODE_ENV === 'production' ? '/aibo-admin-system/' : '/'
 })
