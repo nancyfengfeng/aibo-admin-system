@@ -1,6 +1,5 @@
 <template>
   <div>
-<!--    导航栏-->
     <t-breadcrumb>
       <t-breadcrumb-item to="/">
         <template #icon>
@@ -14,7 +13,7 @@
         </template>全部商品
       </t-breadcrumb-item>
     </t-breadcrumb>
-<!--    按钮栏-->
+
     <div class="flex justify-between mt-5 ">
       <div class="flex items-center">
         <div class="text-base">全部商品</div>
@@ -23,9 +22,9 @@
         </t-tooltip>
       </div>
       <div class="flex justify-end gap-2">
-        <t-button theme="primary">
+        <t-button theme="primary" @click="openDialog()">
           <template #icon><add-icon /></template>
-          添加商品
+          新增商品
         </t-button>
         <t-button variant="outline">
           <template #icon>
@@ -36,7 +35,7 @@
       </div>
     </div>
     <t-divider />
-<!--    筛选栏-->
+
     <div class="flex justify-between">
       <div class="flex gap-2">
         <t-input placeholder="输入要搜索的商品名称" clearable v-model="searchName" :style="{ width: '250px' }">
@@ -70,31 +69,38 @@
           </t-button>
         </t-dropdown>
       </div>
-
     </div>
-<!--    表格-->
+
     <div class="mt-5">
-      <ProductTable />
+      <ProductTable @edit="openDialog"/>
     </div>
 
+    <AddProduct
+        v-model:visible="dialogVisible"
+        :form-data="formData"
+        @success="handleSuccess"
+        :categories = "categoryList"
+    />
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted, h} from 'vue'
+import { ref, onMounted, h } from 'vue'
 import { inject } from 'vue'
 const iconUrl = inject('iconUrl')
-import { AddIcon,SearchIcon,Edit2Icon,BrowseIcon,Delete1Icon} from 'tdesign-icons-vue-next';
-import getCategoryList from "../../common/ProductPage/getCategoryList.js";
+import { AddIcon, SearchIcon, Edit2Icon, BrowseIcon, Delete1Icon } from 'tdesign-icons-vue-next';
+import {getCategoryList} from "../../common/ProductPage/categoryService.js";
 import ProductTable from "../components/ProductTable.vue";
+import AddProduct from "../components/AddProduct.vue";
 
-const tooltipContext='显示 1-10 条，共 65,000 条'
+
+// todo:需要修改这块
+const tooltipContext = '显示 1-10 条，共 65,000 条'
 
 const searchName = ref('')
 const searchCode = ref('')
-
-const categoryList = ref([])        // 绑定到 t-select 的选项
-const selectedCategory = ref(null)  // 当前选择的值
+const categoryList = ref([])
+const selectedCategory = ref(null)
 
 const dropdownOptions = [
   { content: '编辑', value: 1, prefixIcon: () => h(Edit2Icon) },
@@ -105,9 +111,40 @@ onMounted(async () => {
   categoryList.value = await getCategoryList()
 })
 
+// 弹窗
+const dialogVisible = ref(false)
+const formData = ref({})
 
+const openDialog = (row = null) => {
+  dialogVisible.value = true
+
+  // 新增：清空内容，但不替换对象
+  if (!row) {
+    formData.value._id = ''
+    formData.value.name = ''
+    formData.value.code = ''
+    formData.value.category = { _id: '' }
+    formData.value.images = []
+    formData.value.skus = []
+    formData.value.tags = { _id: '' }
+    return
+  }
+
+  // 编辑：逐个赋值，不替换整个对象
+  formData.value._id = row._id || ''
+  formData.value.name = row.name || ''
+  formData.value.code = row.code || ''
+  formData.value.category = row.category || { _id: '' }
+  formData.value.images = row.images || []
+  formData.value.skus = row.skus || []
+  formData.value.tags = row.tags || { _id: '' }
+}
+
+const handleSuccess = () => {
+  console.log('刷新列表')
+  // 在这里调用表格的刷新方法
+}
 </script>
 
 <style scoped lang="scss">
-
 </style>

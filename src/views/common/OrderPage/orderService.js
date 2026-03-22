@@ -1,7 +1,7 @@
 import { app } from '@/utils/cloudbase'
 const models = app.models
 
-export default async function getRecentOrders() {
+export async function getRecentOrders() {
     try {
         const { data } = await models.Orders.list({
             pageSize: 10,

@@ -14,13 +14,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
-  css:{
-    preprocessorOptions: {
-      scss:{
-        additionalData:'@use "@/assets/styles/element.scss" as *;',
-      },
-    },
-  },
+  // css:{
+  //   preprocessorOptions: {
+  //     scss:{
+  //       additionalData:'@use "@/assets/styles/element.scss" as *;',
+  //     },
+  //   },
+  // },
   plugins: [
     vue(),
     AutoImport({
@@ -33,7 +33,7 @@ export default defineConfig({
       resolvers: [
         TDesignResolver({ library: 'vue-next' }),
         ElementPlusResolver({
-          importStyle: 'sass' // 👈 必须写 sass
+          // importStyle: 'sass' // 👈 必须写 sass
         })
       ],
     }),

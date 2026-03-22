@@ -130,12 +130,12 @@ const router = useRouter()
 import * as echarts from 'echarts'
 
 // 函数
-import {getDashboardStats} from "@/views/common/HomePage/getDashboardStats";
-import {getDailySales} from "@/views/common/HomePage/getDailySales";
-import getRecentOrders from "@/views/common/OrderPage/getRecentOrders";
+import {getDashboardStats} from "../../common/HomePage/getDashboardStats";
+import {getDailySales} from "../../common/HomePage/getDailySales";
+import {getRecentOrders} from "../../common/OrderPage/orderService.js";
 
 // 组件
-import OrderTable from '@/components/OrderTable.vue'
+import OrderTable from '../../../components/OrderTable.vue'
 
 // 总览卡片数据
 const overviewOptions = ref([])
