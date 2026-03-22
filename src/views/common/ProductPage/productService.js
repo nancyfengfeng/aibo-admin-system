@@ -180,8 +180,9 @@ export async function addProduct(productData) {
         const res = await models.Product.create({
             data:productData
         })
+        console.log(res)
         return {
-            success:res.data.count > 0,
+            success:res.data.id,
             data:res.data
         }
 
