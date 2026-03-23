@@ -1,7 +1,6 @@
 <template>
   <div>
     <el-table :data="productData" :border="true" style="width: 100%" row-key="_id">
-      <el-table-column type="selection" width="55" fixed="left" />
       <el-table-column type="expand" fixed="left">
         <template #default="props">
           <div class="p-5">
@@ -112,12 +111,26 @@ const productTotal = ref(0)
 
 const emit = defineEmits(['edit'])
 
-const getProductList = async () => {
-  const data = await getProducts(currentPageSize.value, currentPageNum.value)
-  console.log(data)
+
+
+const getProductList = async (filter = {}) => {
+  const loading = ElLoading.service({
+    text: '加载数据中...',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
+  const data = await getProducts(
+      currentPageSize.value,
+      currentPageNum.value,
+      filter
+  )
   productData.value = data.records
   productTotal.value = data.total
+  loading.close()
 }
+
+defineExpose({
+  getProductList
+})
 
 onMounted(() => getProductList())
 
@@ -158,11 +171,20 @@ const handleSaveSku = async (row) => {
   }
 }
 
-const formatDate = (row, col) => {
-  const time = row[col.prop]
+const formatDate = (row) => {
+  // 直接从 row 里拿时间戳，不依赖 column，最稳
+  const time = row.createdAt || row.updatedAt
+
   if (!time) return '-'
-  const d = new Date(time)
-  return d.toLocaleString()
+
+  // 强制转数字 + 生成日期
+  const date = new Date(Number(time))
+
+  // 防止 Invalid Date
+  if (isNaN(date.getTime())) return '-'
+
+  // 返回友好时间
+  return date.toLocaleString()
 }
 </script>
 

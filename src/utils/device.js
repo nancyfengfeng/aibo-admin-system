@@ -1,5 +1,6 @@
-// 判断是否是手机/平板
+// 仅判断是否是手机（iPhone / 安卓）
 export function isMobile() {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    if (typeof navigator === 'undefined') return false;
+    const ua = navigator.userAgent.toLowerCase();
+    return /iphone|android/i.test(ua);
 }

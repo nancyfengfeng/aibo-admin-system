@@ -13,6 +13,8 @@ const routes = [
             { path: '', component: () => import('@/views/pc/pages/HomePage.vue') },
             { path: 'customer', component: () => import('@/views/pc/pages/CustomerPage.vue') },
             { path: 'product', component: () => import('@/views/pc/pages/ProductPage.vue') },
+            { path: 'category&tag', component: () => import('@/views/pc/pages/CategoryTagPage.vue') },
+            { path: 'stock', component: () => import('@/views/pc/pages/StockManagePage.vue') },
         ]
     },
     {

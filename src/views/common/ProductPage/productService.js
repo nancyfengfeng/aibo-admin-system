@@ -1,14 +1,136 @@
 import { app } from '@/utils/cloudbase'
-import {formatCloudUrl, revertCloudUrl} from "../../../utils/formatCloudUrl.js";
 const models = app.models
-import { storage} from '@/utils/cloudbase'
 
+// ================================
+// 1. 构建搜索筛选条件（支持：搜索 + 分类）
+// ================================
+function buildProductFilter(filter = {}) {
+    const { useWordSearch, categoryId, ...restFilter } = filter;
+    const finalFilter = {};
+
+    // ==========================================
+    // 1. 处理【分词搜索】：name / code → where
+    // ==========================================
+    if (useWordSearch) {
+        const orArr = [];
+
+        // 名称分词
+        if (restFilter.name) {
+            const keyword = restFilter.name.trim();
+            const charArray = [...new Set(keyword.split(""))];
+            const nameMatch = {
+                $and: charArray.map((char) => ({
+                    name: { $regex_ci: char },
+                })),
+            };
+            orArr.push(nameMatch);
+        }
+
+        // 编号搜索
+        if (restFilter.code) {
+            orArr.push({ code: { $search: restFilter.code } });
+        }
+
+        if (orArr.length > 0) {
+            finalFilter.where = orArr.length === 1 ? orArr[0] : { $or: orArr };
+        }
+    }
+
+    // ==========================================
+    // 2. 处理【分类】→ relateWhere
+    // ==========================================
+    if (categoryId) {
+        finalFilter.relateWhere = {
+            category: {
+                where: {
+                    _id: { $eq: categoryId },
+                },
+            },
+        };
+    }
+
+    return finalFilter;
+}
+
+// ================================
+// 2. 批量获取 SKU
+// ================================
+async function fetchProductSkus(productIds) {
+    try {
+        const skuResult = await models.SKU.list({
+            filter: {
+                relateWhere: {
+                    product_sku: { where: { _id: { $in: productIds } } }
+                }
+            },
+            select: {
+                _id: true,
+                product_sku: { _id: true },
+                skuCode: true,
+                enabled: true,
+                stock: true,
+                price: true,
+                attributes: true,
+                vip_price: true
+            }
+        })
+        return skuResult.data.records || []
+    } catch (e) {
+        console.error('获取SKU失败', e)
+        return []
+    }
+}
+
+// ================================
+// 3. 格式化图片（生成签名）
+// ================================
+async function formatProductImages(products) {
+    const allImagePaths = []
+    products.forEach(p => {
+        if (p.images && Array.isArray(p.images)) {
+            allImagePaths.push(...p.images)
+        }
+    })
+
+    const signedUrlMap = {}
+    if (allImagePaths.length > 0) {
+        const { data: signedData } = await app.storage
+            .from()
+            .createSignedUrls(allImagePaths, 3600 * 24 * 7)
+        signedData.forEach(item => {
+            signedUrlMap[item.path] = item.signedUrl
+        })
+    }
+
+    return products.map(product => {
+        if (product.images && Array.isArray(product.images)) {
+            product.images = product.images.map(img => {
+                const fullPath = img.replace(
+                    'cloud://cloud1-1gx1jccfb2c6cfd9/',
+                    'cloud://cloud1-1gx1jccfb2c6cfd9.636c-cloud1-1gx1jccfb2c6cfd9-1397980379/'
+                )
+                const url = signedUrlMap[fullPath] || ''
+                return { fileId: img, url }
+            })
+        }
+        return product
+    })
+}
+
+// ================================
+// 主函数（清爽！）
+// ================================
 export async function getProducts(pageSize, pageNumber, filter = {}) {
     try {
+        // 1. 构建筛选条件
+        const finalFilter = buildProductFilter(filter)
+        console.log(finalFilter)
+
+        // 2. 查询商品
         const { data } = await models.Product.list({
             pageSize,
             pageNumber,
-            filter,
+            filter: finalFilter,
             select: {
                 name: true,
                 description: true,
@@ -25,74 +147,22 @@ export async function getProducts(pageSize, pageNumber, filter = {}) {
 
         const productIds = data.records.map(item => item._id)
 
-        const skuResult = await models.SKU.list({
-            filter: {
-                relateWhere: {
-                    product_sku: {
-                        where: { _id: { $in: productIds } }
-                    }
-                }
-            },
-            select: {
-                _id: true,
-                product_sku: { _id: true },
-                skuCode: true,
-                enabled: true,
-                stock: true,
-                price: true,
-                attributes: true,
-                vip_price: true
-            }
-        })
+        // 3. 获取SKU
+        const allSkus = await fetchProductSkus(productIds)
 
-        const allSkus = skuResult.data.records || []
+        // 4. 格式化图片
+        const formattedRecords = await formatProductImages(data.records)
 
-        // 收集所有图片
-        const allImagePaths = []
-        data.records.forEach(p => {
-            if (p.images && Array.isArray(p.images)) allImagePaths.push(...p.images)
-        })
-
-        // 批量获取签名URL
-        const signedUrlMap = {}
-        if (allImagePaths.length > 0) {
-            const { data: signedData } = await app.storage
-                .from()
-                .createSignedUrls(allImagePaths, 3600 * 24 * 7)
-
-            signedData.forEach(item => {
-                signedUrlMap[item.path] = item.signedUrl
-            })
-        }
-        console.log("signedUrlMap", signedUrlMap)
-
-        const formattedRecords = data.records.map(product => {
-            if (product.images && Array.isArray(product.images)) {
-                product.images = product.images.map(img => {
-                    // 生成完整路径去匹配签名URL
-                    const fullPath = img.replace(
-                        "cloud://cloud1-1gx1jccfb2c6cfd9/",
-                        "cloud://cloud1-1gx1jccfb2c6cfd9.636c-cloud1-1gx1jccfb2c6cfd9-1397980379/"
-                    )
-                    const url = signedUrlMap[fullPath] || ''
-
-                    // ✅ 你要的标准格式！
-                    return {
-                        fileId: img,
-                        url: url
-                    }
-                })
-            }
-
+        // 5. 绑定SKU
+        const result = formattedRecords.map(product => {
             product.skus = allSkus.filter(sku => sku.product_sku._id === product._id)
             return product
         })
-        console.log("formattedRecords", formattedRecords)
 
-        return { ...data, records: formattedRecords }
+        return { ...data, records: result }
 
     } catch (err) {
-        console.error("获取商品失败", err)
+        console.error('获取商品失败', err)
         return { records: [], total: 0 }
     }
 }

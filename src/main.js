@@ -11,7 +11,7 @@ const app = createApp(App)
 app.use(router)
 app.component('IconFont', IconFont)
 // 全局提供
-app.provide('iconUrl', 'https://at.alicdn.com/t/c/font_5139612_fph9xv2il7f.css')
+app.provide('iconUrl', 'https://at.alicdn.com/t/c/font_5139612_acgvtqpd48q.css')
 
 app.mount('#app')
 
