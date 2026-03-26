@@ -109,7 +109,7 @@ const currentPageSize = ref(10)
 const currentPageNum = ref(1)
 const productTotal = ref(0)
 
-const emit = defineEmits(['edit'])
+const emit = defineEmits(['edit','update'])
 
 
 
@@ -123,13 +123,22 @@ const getProductList = async (filter = {}) => {
       currentPageNum.value,
       filter
   )
+
   productData.value = data.records
   productTotal.value = data.total
+  emit('update', {
+    currentPageNum: currentPageNum.value,
+    currentPageSize: currentPageSize.value,
+    total: productTotal.value
+  })
   loading.close()
 }
 
 defineExpose({
-  getProductList
+  getProductList,
+  currentPageSize,
+  currentPageNum,
+  productTotal
 })
 
 onMounted(() => getProductList())

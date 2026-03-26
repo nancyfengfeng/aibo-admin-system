@@ -22,7 +22,7 @@
         </t-tooltip>
       </div>
       <div class="flex justify-end gap-2">
-        <t-button variant="outline" @click="goTo('/stock')">
+        <t-button variant="outline" @click="goTo('/stock')" disabled>
           <template #icon>
             <icon-font name="iconfont icon-cangku_kucunxiangqing" :url="iconUrl" size="24" class="mr-2"/>
           </template>
@@ -84,7 +84,7 @@
     </div>
 
     <div class="mt-5">
-      <ProductTable @edit="openDialog" ref="productTableRef"/>
+      <ProductTable @edit="openDialog" ref="productTableRef" @update="handlePageUpdate"/>
     </div>
 
     <AddProduct
@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, h } from 'vue'
+import { ref, onMounted, h,computed } from 'vue'
 import { inject } from 'vue'
 import { AddIcon, SearchIcon, Edit2Icon, BrowseIcon, Delete1Icon } from 'tdesign-icons-vue-next';
 import {getCategoryList} from "../../common/ProductPage/categoryService.js";
@@ -111,8 +111,17 @@ const router = useRouter()
 
 const iconUrl = inject('iconUrl')
 
-// todo:需要修改这块
-const tooltipContext = '显示 1-10 条，共 65,000 条'
+const tooltipContext = ref('')
+
+const handlePageUpdate = (page) => {
+  const { currentPageNum, currentPageSize, total } = page
+
+  const start = (currentPageNum - 1) * currentPageSize + 1
+  const end = Math.min(currentPageNum * currentPageSize, total)
+
+  tooltipContext.value =
+      `显示 ${start}-${end} 条，共 ${total} 条`
+}
 
 const searchName = ref('')
 const searchCode = ref('')
