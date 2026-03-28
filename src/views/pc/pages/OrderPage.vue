@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 95%">
     <!-- 面包屑 -->
     <div class="mb-6">
       <t-breadcrumb>
@@ -37,6 +37,8 @@
         </el-tooltip>
       </div>
     </div>
+
+
     <div class="flex justify-between">
       <!-- 批量操作按钮 -->
       <div class="mb-4 flex gap-3">
@@ -60,11 +62,32 @@
       </div>
     </div>
 
+    <div class="flex bg-white p-5 gap-10">
+      <div class="flex items-center">
+        <div class="text-sm text-slate-500">订单号：</div>
+        <div>
+          <el-input clearable v-model="orderNoSearch" placeholder="可只输入订单后几位" style="width: 250px">
+            <template #prepend>aibo-</template>
+          </el-input>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <div class="text-sm text-slate-500">客户编号：</div>
+        <div>
+          <el-input clearable v-model="customerNoSearch" style="width: 250px">
+            <template #prepend>AIBO-</template>
+          </el-input>
+        </div>
+      </div>
+      <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
+
+    </div>
     <!-- 订单表格 -->
     <OrderTable
         :order-list="orderList"
         @update-status="openUpdateDialog"
         @selection-change="handleSelectionChange"
+        @update-order-list="handleUpdateOrderList"
     />
 
     <!-- 分页 -->
@@ -93,10 +116,12 @@
         </el-form-item>
         <el-form-item label="支付方式" v-if="updateForm.status === 3">
           <el-select v-model="updateForm.payType" placeholder="请选择支付方式">
-            <el-option label="银行转账" value="1" />
-            <el-option label="现金" value="2" />
-            <el-option label="SINPE" value="3" />
-            <el-option label="刷卡" value="4" />
+            <el-option
+                v-for="item in payTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -112,6 +137,7 @@
 <script setup>
 import { ref, onMounted, inject,nextTick } from 'vue'
 import { useRouter } from "vue-router"
+import {  Search } from '@element-plus/icons-vue'
 import {fetchAllOrders, fetchOrderCount, updateOrderStatus} from "../../common/OrderPage/orderService.js"
 import OrderTable from "../components/OrderTable.vue"
 import {useOrderPdfStore} from "../../../stores/orderPdfStore.js";
@@ -124,6 +150,9 @@ const currentPageNum = ref(1)
 const OrderTotal = ref(0)
 const orderList = ref([])
 const selectedOrders = ref([])
+
+const orderNoSearch = ref('')
+const customerNoSearch = ref('')
 
 // 弹窗
 const updateDialogVisible = ref(false)
@@ -143,6 +172,13 @@ const stats = ref([
   { title: '已完成', value: 0, bg: 'bg-green-100', color: 'text-green-600', icon: 'icon-yiwancheng', status: '4' },
   { title: '全部', value: 0, bg: 'bg-stone-100', color: 'text-stone-600', icon: 'icon-zongdingdan' },
 ])
+
+const payTypeOptions = [
+  { label: '银行转账', value: '1' },
+  { label: '现金', value: '2' },
+  { label: 'SINPE', value: '3' },
+  { label: '刷卡', value: '4' }
+]
 
 // 获取订单列表
 const getAllOrderList = async () => {
@@ -307,6 +343,40 @@ const confirmUpdate = async () => {
   } catch (err) {
     console.error(err)
     ElMessage.error('接口请求异常')
+  }
+}
+
+const handleUpdateOrderList = async (updatedOrder) => {
+  // 找到下标
+  const index = orderList.value.findIndex(item => item._id === updatedOrder._id)
+  if (index !== -1) {
+    const newList = [...orderList.value]
+    newList[index] = updatedOrder
+    orderList.value = newList
+  }
+  // 👇 👇 👇 这里自动刷新顶部统计数字！
+  const promises = stats.value.map(item => fetchOrderCount(item.status))
+  const results = await Promise.all(promises)
+  results.forEach((count, idx) => {
+    stats.value[idx].value = count
+  })
+}
+
+// 搜索
+const handleSearch  = async ()=>{
+  const loading = ElLoading.service({ text: '加载中...' })
+  try {
+    const filter = {
+      customerNo: customerNoSearch.value,   // 客户编号
+      orderNo: orderNoSearch.value          // 订单号
+    }
+    currentPageNum.value = 1
+    const res = await fetchAllOrders(currentPageSize.value, 1, filter)
+    orderList.value = res.result
+  } catch (err) {
+    console.error(err)
+  } finally {
+    loading.close()
   }
 }
 

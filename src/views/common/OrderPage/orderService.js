@@ -82,7 +82,7 @@ export async function fetchOrderCount(status) {
 }
 
 function buildOrderFilter(filter = {}) {
-    const { status, customerID } = filter
+    const { status, customerNo, orderNo } = filter
     const finalFilter = {}
 
     // ----------------------
@@ -95,17 +95,32 @@ function buildOrderFilter(filter = {}) {
     }
 
     // ----------------------
-    // 2. 处理客户关联查询 relateWhere
+    // 2. 新增：按订单编号 orderNo 筛选
     // ----------------------
-    if (customerID) {
+    if (orderNo) {
+        // 如果已有 where，合并；没有就新建
+        finalFilter.where = {
+            ...finalFilter.where,
+            order_no: { $search: orderNo }
+        }
+    }
+
+    // ----------------------
+    // 3. 处理客户关联查询 relateWhere
+    // ----------------------
+    if (customerNo) {
+        const realCustomerNo = customerNo.startsWith('AIBO-')
+            ? customerNo
+            : `AIBO-${customerNo}`
         finalFilter.relateWhere = {
             customer: {
                 where: {
-                    _id: { $eq: customerID }
+                    inviteCode: { $eq: realCustomerNo }
                 }
             }
         }
     }
+    console.log(finalFilter)
 
     return finalFilter
 }
@@ -137,6 +152,11 @@ export async function fetchAllOrders(pageSize, pageNumber, filter = {}) {
                 shipping_time:true,
                 receive_time:true,
                 cancel_time:true,
+                pay_type:true,
+                pay_status:true,
+                total_amount:true,
+                discount_amount:true,
+                remark:true,
             },
             getCount: true
         })
@@ -195,19 +215,10 @@ export async function fetchAllOrders(pageSize, pageNumber, filter = {}) {
             )
 
             return {
-                _id: order._id,
-                order_no: order.order_no,
-                customerCode: order.customer?.inviteCode || 'AIBO-xxxxxxxx',
-                customerName: order.customer?.storeName || '未知客户',
-                totalQuantity: totalQuantity,
-                order_status: order.order_status,
-                actual_amount: order.actual_amount,
-                createdAt: order.createdAt,
-                updatedAt: order.updatedAt,
-                pay_time:order.pay_time,
-                shipping_time:order.shipping_time,
-                receive_time:order.receive_time,
-                cancel_time:order.cancel_time,
+                ...order, // 直接展开所有字段
+                customerCode: order.customer?.inviteCode ?? 'AIBO-xxxxxxxx',
+                customerName: order.customer?.storeName ?? '未知客户',
+                totalQuantity,
                 items: currentItems
             }
         })

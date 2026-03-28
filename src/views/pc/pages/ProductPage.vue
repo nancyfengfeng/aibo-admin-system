@@ -46,12 +46,12 @@
       <div class="flex gap-2">
         <t-input placeholder="输入要搜索的商品名称" clearable v-model="searchName" :style="{ width: '250px' }">
           <template #suffixIcon>
-            <search-icon :style="{ cursor: 'pointer' }" />
+            <search-icon />
           </template>
         </t-input>
         <t-input placeholder="输入商品编号，如 NG-081" clearable v-model="searchCode" :style="{ width: '250px' }">
           <template #suffixIcon>
-            <search-icon :style="{ cursor: 'pointer' }" />
+            <search-icon/>
           </template>
         </t-input>
         <el-button type="primary" :icon="Search" class="ml-2" @click="handleSearch">Search</el-button>
