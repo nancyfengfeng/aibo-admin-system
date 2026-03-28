@@ -120,11 +120,10 @@ async function formatProductImages(products) {
 // ================================
 // 主函数（清爽！）
 // ================================
-export async function getProducts(pageSize, pageNumber, filter = {}) {
+export async function fetchProducts(pageSize, pageNumber, filter = {}) {
     try {
         // 1. 构建筛选条件
         const finalFilter = buildProductFilter(filter)
-        console.log(finalFilter)
 
         // 2. 查询商品
         const { data } = await models.Product.list({
@@ -167,7 +166,7 @@ export async function getProducts(pageSize, pageNumber, filter = {}) {
     }
 }
 
-export async function getProductShownSku(spuId){
+export async function fetchProductShownSku(spuId){
     try{
         const { data } = await models.Product.get({
             filter: {

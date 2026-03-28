@@ -5,13 +5,15 @@ import { IconFont } from 'tdesign-icons-vue-next';
 import 'tdesign-vue-next/es/style/index.css';
 import './main.css'
 import '@/assets/theme.css'
+import { createPinia } from 'pinia'
 
 const app = createApp(App)
 
 app.use(router)
+app.use(createPinia())
 app.component('IconFont', IconFont)
 // 全局提供
-app.provide('iconUrl', 'https://at.alicdn.com/t/c/font_5139612_acgvtqpd48q.css')
+app.provide('iconUrl', 'https://at.alicdn.com/t/c/font_5139612_q8orndu1w2e.css')
 
 app.mount('#app')
 

@@ -79,7 +79,7 @@
       <el-table-column label="更新时间" prop="updatedAt" width="180" :formatter="formatDate"/>
       <el-table-column label="操作" width="80" fixed="right">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button link type="primary" @click="handleEdit(scope.row)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -100,7 +100,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getProducts } from "../../common/ProductPage/productService.js"
+import { fetchProducts } from "../../common/ProductPage/productService.js"
 import { Check } from '@element-plus/icons-vue'
 import {updateSku} from "../../common/ProductPage/skuService.js";
 
@@ -118,7 +118,7 @@ const getProductList = async (filter = {}) => {
     text: '加载数据中...',
     background: 'rgba(0, 0, 0, 0.7)'
   })
-  const data = await getProducts(
+  const data = await fetchProducts(
       currentPageSize.value,
       currentPageNum.value,
       filter

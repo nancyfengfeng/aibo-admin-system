@@ -100,7 +100,7 @@
 import { ref, onMounted, h,computed } from 'vue'
 import { inject } from 'vue'
 import { AddIcon, SearchIcon, Edit2Icon, BrowseIcon, Delete1Icon } from 'tdesign-icons-vue-next';
-import {getCategoryList} from "../../common/ProductPage/categoryService.js";
+import {fetchCategoryList} from "../../common/ProductPage/categoryService.js";
 import ProductTable from "../components/ProductTable.vue";
 import AddProduct from "../components/AddProduct.vue";
 import { useRouter } from 'vue-router'
@@ -134,7 +134,7 @@ const dropdownOptions = [
 ]
 
 onMounted(async () => {
-  categoryList.value = await getCategoryList()
+  categoryList.value = await fetchCategoryList()
   searchName.value = ""
   searchCode.value = ""
 })

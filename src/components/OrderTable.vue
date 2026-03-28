@@ -15,11 +15,12 @@
     <thead>
     <tr class="border-b border-slate-200">
       <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">订单号</th>
-      <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">客户</th>
+      <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">客户店铺名</th>
+      <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">客户编号</th>
       <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">商品数量</th>
-      <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">金额</th>
-      <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">状态</th>
-      <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">日期</th>
+      <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">订单金额</th>
+      <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">订单状态</th>
+      <th class="text-left px-6 py-3 text-sm font-medium text-slate-600">创建日期</th>
       <th
           class="text-left px-6 py-3 text-sm font-medium text-slate-600"
           v-if="showAction"
@@ -40,6 +41,10 @@
 
       <td class="px-6 py-4 text-sm text-slate-900">
         {{ item.customerName }}
+      </td>
+
+      <td class="px-6 py-4 text-sm text-slate-900">
+        {{ item.customerCode }}
       </td>
 
       <td class="px-6 py-4 text-sm text-slate-600">

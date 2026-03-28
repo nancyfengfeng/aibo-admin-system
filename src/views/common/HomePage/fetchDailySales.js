@@ -2,7 +2,7 @@ import { app } from '@/utils/cloudbase'
 const models = app.models
 
 // 获取当月每日销售额（给图表用）
-export async function getDailySales() {
+export async function fetchDailySales() {
     const now = new Date()
     const year = now.getFullYear()
     const month = now.getMonth()

@@ -1,7 +1,7 @@
 import { app } from '@/utils/cloudbase'
 const models = app.models
 
-export async function getTagList() {
+export async function fetchTagList() {
     try {
         const { data } = await models.Tag.list({
             filter: {

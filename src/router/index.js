@@ -16,6 +16,7 @@ const routes = [
             { path: 'category&tag', component: () => import('@/views/pc/pages/CategoryTagPage.vue') },
             { path: 'stock', component: () => import('@/views/pc/pages/StockManagePage.vue') },
             { path: 'order', component: () => import('@/views/pc/pages/OrderPage.vue') },
+            { path: 'order-pdf', component: () => import('@/views/pc/pages/OrderPDFPage.vue') },
         ]
     },
     {

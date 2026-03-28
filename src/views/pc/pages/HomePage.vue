@@ -101,7 +101,7 @@
       <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
         <h3 class="text-lg font-semibold text-slate-900">最近订单</h3>
         <button
-            onclick="window.location.href='/orders'"
+            @click="goTo('/order')"
             class="text-sm text-blue-600 hover:text-blue-500 cursor-pointer"
         >
           查看全部订单 →
@@ -112,7 +112,7 @@
 
       <div class="px-6 py-3 border-t border-slate-200">
         <button
-            onclick="window.location.href='/orders'"
+            @click="goTo('/order')"
             class="text-sm text-blue-600 hover:text-blue-500 cursor-pointer"
         >
           查看所有订单 →
@@ -131,8 +131,8 @@ import * as echarts from 'echarts'
 
 // 函数
 import {getDashboardStats} from "../../common/HomePage/getDashboardStats";
-import {getDailySales} from "../../common/HomePage/getDailySales";
-import {getRecentOrders} from "../../common/OrderPage/orderService.js";
+import {fetchDailySales} from "../../common/HomePage/fetchDailySales.js";
+import {fetchRecentOrders} from "../../common/OrderPage/orderService.js";
 
 // 组件
 import OrderTable from '../../../components/OrderTable.vue'
@@ -151,8 +151,8 @@ onMounted(async () => {
     // 2. 并行获取数据（更快）
     const [overviewData, salesData, recentOrders] = await Promise.all([
       getDashboardStats(),
-      getDailySales(),
-      getRecentOrders() // ✅ 在这里获取最近订单
+      fetchDailySales(),
+      fetchRecentOrders() // ✅ 在这里获取最近订单
     ])
 
     overviewOptions.value = overviewData
@@ -203,6 +203,10 @@ function renderChart(days, amounts) {
       }
     }]
   })
+}
+
+const goTo = (url)=>{
+  router.push(url)
 }
 
 onUnmounted(() => {

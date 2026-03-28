@@ -1,7 +1,7 @@
 import { app } from '@/utils/cloudbase'
 const models = app.models
 
-export async function getCategoryList() {
+export async function fetchCategoryList() {
     try{
         const {data} = await models.Category.list({
             filter:{

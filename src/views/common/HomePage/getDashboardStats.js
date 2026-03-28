@@ -2,7 +2,7 @@ import { app } from '@/utils/cloudbase'
 const models = app.models
 
 // 公共方法：根据时间段获取统计
-async function getOrderData(monthStart, monthEnd) {
+async function fetchOrderData(monthStart, monthEnd) {
     try {
         const orderRes = await models.Orders.list({
             filter: {
@@ -65,8 +65,8 @@ export async function getDashboardStats() {
     const lastEnd = new Date(year, month, 1).getTime()
 
     // 查询
-    const current = await getOrderData(currentStart, currentEnd)
-    const last = await getOrderData(lastStart, lastEnd)
+    const current = await fetchOrderData(currentStart, currentEnd)
+    const last = await fetchOrderData(lastStart, lastEnd)
 
     // 👇 最终返回你要的数组结构！！！
     return [

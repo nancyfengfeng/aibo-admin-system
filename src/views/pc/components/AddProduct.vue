@@ -249,11 +249,11 @@
 
 <script setup>
 import { computed, onMounted, ref, watch, nextTick } from 'vue'
-import { getTagList } from '../../common/ProductPage/tagService.js'
+import { fetchTagList } from '../../common/ProductPage/tagService.js'
 import { storage } from '@/utils/cloudbase'
 import { Plus } from '@element-plus/icons-vue'
 import { updateSku ,addSku} from "../../common/ProductPage/skuService.js"
-import {formattedProductData, getProductShownSku, updateProduct, addProduct} from "../../common/ProductPage/productService.js";
+import {formattedProductData, fetchProductShownSku, updateProduct, addProduct} from "../../common/ProductPage/productService.js";
 
 
 const props = defineProps({
@@ -297,7 +297,7 @@ watch(
 
       // ✅ 编辑商品：才请求接口
       try {
-        const shownId = await getProductShownSku(newSpuId)
+        const shownId = await fetchProductShownSku(newSpuId)
         const skus = props.formData?.skus || []
         const match = skus.find(sku => sku._id === shownId)
         shownSkuIdMap.value[newSpuId] = match ? match._id : ''
@@ -316,7 +316,7 @@ const visibleLocal = computed({
 // 标签
 const tagList = ref([{ _id: '', name: '' }])
 onMounted(async () => {
-  tagList.value = await getTagList()
+  tagList.value = await fetchTagList()
 })
 
 // ==========================

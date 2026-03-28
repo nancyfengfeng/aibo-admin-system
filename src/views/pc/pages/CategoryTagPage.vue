@@ -153,8 +153,8 @@
 
 <script setup>
 import {ref, onMounted, inject,nextTick, computed} from 'vue'
-import {addCategory, getCategoryList, updateCategory} from "../../common/ProductPage/categoryService.js";
-import {addTag, getTagList, updateTag} from "../../common/ProductPage/tagService.js";
+import {addCategory, fetchCategoryList, updateCategory} from "../../common/ProductPage/categoryService.js";
+import {addTag, fetchTagList, updateTag} from "../../common/ProductPage/tagService.js";
 import {ElMessage} from "element-plus";
 
 const iconUrl = inject('iconUrl')
@@ -172,8 +172,8 @@ onMounted(async () => {
   try {
     // 并行请求，同时加载
     const [categoryList, tagList] = await Promise.all([
-      getCategoryList(),
-      getTagList()
+      fetchCategoryList(),
+      fetchTagList()
     ])
 
     // 同步赋值
