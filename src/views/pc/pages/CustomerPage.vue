@@ -108,8 +108,22 @@
             </el-table-column>
           </el-table-column>
 
+          <el-table-column label="联系方式" align="center">
+            <template #default="scope">
+              <el-tooltip
+                  effect="dark"
+                  :content="scope.row.phone || '无联系方式'"
+                  placement="top"
+              >
+                <span class="text-center" :class="!scope.row.phone? 'text-slate-300' : ''">
+                  {{ scope.row.phone || '无联系方式' }}
+                </span>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+
           <!-- 地区 -->
-          <el-table-column label="客户所在地区" align="center">
+          <el-table-column label="所在地区" align="center">
             <template #default="scope">
               {{
                 regionList.find(item => item.value === scope.row.region)?.label || '—'
@@ -123,7 +137,6 @@
               <div class="flex justify-center">
                 <el-button
                     type="text"
-                    size="mini"
                     @click="openMap(scope.row.storeLocation)"
                     :disabled="!hasCoordinates(scope.row.storeLocation)"
                 >
@@ -148,7 +161,7 @@
           <el-table-column prop="status" label="客户状态" align="center">
             <template #default="scope">
               <div class="flex items-center justify-center">
-                <el-icon v-if="scope.row.status" size="25" color="#67C23A"><CircleCheckFilled /></el-icon>
+                <el-icon v-if="scope.row.status==='1'" size="25" color="#67C23A"><CircleCheckFilled /></el-icon>
                 <el-icon v-else size="25" color="#d5dfe1"><CircleCloseFilled /></el-icon>
               </div>
             </template>
@@ -187,6 +200,7 @@
             :total="OrderTotal"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
+
         />
       </div>
     </el-card>
@@ -198,6 +212,8 @@
         :mode="dialogMode"
         :vipList="vipList"
         :regionList="regionList"
+        :openMap="openMap"
+        :hasCoordinates="hasCoordinates"
         @submit="handleSubmit"
     />
   </div>
@@ -206,7 +222,11 @@
 <script setup>
 import { ref, reactive, onMounted, inject } from 'vue'
 import { Search, CircleCheckFilled, CircleCloseFilled, Refresh, Plus } from "@element-plus/icons-vue";
-import { fetchAllCustomers } from "../../common/CustomerPage/customerService.js";
+import {
+  createCustomerDetail,
+  fetchAllCustomers,
+  updateCustomerDetail
+} from "../../common/CustomerPage/customerService.js";
 import AddCustomer from "../components/AddCustomer.vue";
 
 const iconUrl = inject('iconUrl')
@@ -241,9 +261,18 @@ const regionList = ref([
 
 
 const hasCoordinates = (storeLocation) => {
-  const coords = storeLocation?.geopoint?.coordinates
-  return coords?.[0] != null && coords?.[1] != null
-}
+  const coords = storeLocation?.geopoint?.coordinates;
+
+  return (
+      Array.isArray(coords) &&
+      coords.length >= 2 &&
+      coords[0] != null &&
+      coords[1] != null &&
+      // 关键：排除 0,0
+      coords[0] !== 0 &&
+      coords[1] !== 0
+  );
+};
 
 const getVip = (level) => {
   return vipList.value.find(v => v.key === level) || {
@@ -252,8 +281,6 @@ const getVip = (level) => {
   }
 }
 
-// 弹窗
-const dialogVisible = ref(false)
 
 // 函数生成默认表单
 const createCustomerForm = () => ({
@@ -262,9 +289,10 @@ const createCustomerForm = () => ({
   region: '',
   remark: '',
   status: '',
-  storeLocation: { address: '', geopoint: { coordinates: [] } },
+  storeLocation: { address: '', geopoint: { coordinates: [0,0] } },
   storeName: '',
-  wechatOpenId: ['', '', ''],
+  wechatOpenId: [],
+  phone: '',
   _id: ''
 })
 
@@ -280,16 +308,73 @@ const openCustomerDialog = (row = null) => {
   addCustomerRef.value.openDialog()
 }
 
+const buildCustomerDetail = (formData) => {
+  // 初始化空对象
+  const customerDetail = {}
+
+  // 必传字段（一定放入）
+  customerDetail.VIPLevel = formData.VIPLevel
+  customerDetail.region = formData.region
+  customerDetail.status = '1'
+  customerDetail.storeName = formData.storeName
+
+  // 可选字段（安全判断，不会报错）
+  if (formData.inviteCode && formData.inviteCode.trim() !== '') {
+    const code = formData.inviteCode.trim()
+    // 判断：不是空的，且不等于 "AIBO-"
+    if (code !== 'AIBO-') {
+      customerDetail.inviteCode = code
+    }
+  }
+  if (formData.phone && formData.phone.toString().trim() !== '') {
+    customerDetail.phone = formData.phone.toString().trim()
+  }
+  if (formData.remark && formData.remark.trim() !== '') {
+    customerDetail.remark = formData.remark
+  }
+
+  // 坐标处理
+  const coords = formData.storeLocation?.geopoint?.coordinates || []
+  const [lng, lat] = coords
+
+  const isValid =
+      !isNaN(Number(lng)) &&
+      !isNaN(Number(lat)) &&
+      !(Number(lng) === 0 && Number(lat) === 0)
+
+  if (isValid) {
+    customerDetail.storeLocation = {
+      address: formData.storeName,
+      geopoint: {
+        coordinates: [Number(lng), Number(lat)],
+        type: 'Point'
+      }
+    }
+  }
+
+
+  // 返回构造好的最终对象
+  return customerDetail
+}
+
 // 提交表单
-const handleSubmit = (dataFromChild) => {
-  console.log('子组件提交的数据：', dataFromChild)
+const handleSubmit = async (dataFromChild) => {
+  const customerDetail = buildCustomerDetail(dataFromChild)
+  const customerId = dataFromChild._id
+  dataFromChild.status = '1'
 
-  // ✅ 在这里更新父组件的表单/列表
-  Object.assign(customerForm, dataFromChild)
-
-  // 如果你要更新表格数据
-  // 在这里调用刷新接口即可
-  getCustomerList()
+  if (customerId) {
+    // 编辑
+    const res = await updateCustomerDetail(customerId, customerDetail)
+    if (res.success) {
+      const idx = customerList.value.findIndex(i => i._id === customerId)
+      if (idx !== -1) customerList.value[idx] = dataFromChild
+    }
+  } else {
+    // 新增
+    const res = await createCustomerDetail(customerDetail)
+    if (res.success) customerList.value.push(dataFromChild)
+  }
 }
 
 // 搜索

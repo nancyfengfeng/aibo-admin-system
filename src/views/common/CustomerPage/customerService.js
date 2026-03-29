@@ -56,3 +56,75 @@ export async function fetchAllCustomers(pageSize, pageNumber, filter = {}){
         return { result: [], total: 0 }
     }
 }
+
+export async function updateWechatOpenId(customerId,openIds){
+    try {
+        const {data} = await models.Customer.update({
+            filter:{
+                where:{
+                    _id:customerId,
+                }
+            },
+            data:{
+                wechatOpenId:openIds
+            }
+        })
+        return {
+            success:data.count > 0
+        }
+    }catch (error) {
+        return {success:false}
+    }
+}
+
+export async function updateCustomerDetail(customerId,customerDetail){
+    try{
+        const {data} =await models.Customer.update({
+            filter:{
+                where:{
+                    _id:customerId,
+                }
+            },
+            data:customerDetail
+        })
+        console.log(data)
+        return {
+            success:data.count > 0
+        }
+    }catch (error) {
+        console.log(error)
+        return {success:false}
+    }
+}
+
+export async function createCustomerDetail(customerDetail){
+    try{
+        const {data} = await models.Customer.create({
+            data:customerDetail
+        })
+        return {
+            success:true
+        }
+    }catch (error) {
+        console.log(error)
+        return {
+            success:false
+        }
+    }
+}
+
+export async function fetchInviteCodeList(){
+    try{
+        const{data} = await models.Customer.list({
+            select:{
+                inviteCode:true
+            }
+        })
+
+        // 把所有 inviteCode 提取成一个纯数组
+        return data.records.map(item => item.inviteCode)
+
+    }catch (error) {
+        return []
+    }
+}
