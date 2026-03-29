@@ -120,8 +120,6 @@ function buildOrderFilter(filter = {}) {
             }
         }
     }
-    console.log(finalFilter)
-
     return finalFilter
 }
 
