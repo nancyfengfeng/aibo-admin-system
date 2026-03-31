@@ -62,7 +62,7 @@ export async function updateWechatOpenId(customerId,openIds){
         const {data} = await models.Customer.update({
             filter:{
                 where:{
-                    _id:customerId,
+                    _id:{$eq:customerId},
                 }
             },
             data:{
@@ -82,7 +82,7 @@ export async function updateCustomerDetail(customerId,customerDetail){
         const {data} =await models.Customer.update({
             filter:{
                 where:{
-                    _id:customerId,
+                    _id:{$eq:customerId},
                 }
             },
             data:customerDetail

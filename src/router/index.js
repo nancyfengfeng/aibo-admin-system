@@ -17,6 +17,7 @@ const routes = [
             { path: 'stock', component: () => import('@/views/pc/pages/StockManagePage.vue') },
             { path: 'order', component: () => import('@/views/pc/pages/OrderPage.vue') },
             { path: 'order-pdf', component: () => import('@/views/pc/pages/OrderPDFPage.vue') },
+            { path: 'setting', component: () => import('@/views/pc/pages/SettingPage.vue') },
         ]
     },
     {

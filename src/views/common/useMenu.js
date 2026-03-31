@@ -11,7 +11,7 @@ export function useMenu() {
         { title: '商品管理', path: '/product', icon: 'cardmembership', el_icon: 'GoodsFilled' },
         { title: '订单管理', path: '/order', icon: 'cart', el_icon: 'ShoppingCartFull' },
         { title: '客户管理', path: '/customer', icon: 'user', el_icon: 'UserFilled' },
-        { title: '小程序管理', path: '/mini_program', icon: 'logo-miniprogram', el_icon: 'Setting' }
+        { title: '小程序管理', path: '/setting', icon: 'logo-miniprogram', el_icon: 'Setting' }
     ])
 
     // 先给个默认值

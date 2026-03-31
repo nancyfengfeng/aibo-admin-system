@@ -13,7 +13,7 @@ app.use(router)
 app.use(createPinia())
 app.component('IconFont', IconFont)
 // 全局提供
-app.provide('iconUrl', 'https://at.alicdn.com/t/c/font_5139612_9nps7ocb1ht.css')
+app.provide('iconUrl', 'https://at.alicdn.com/t/c/font_5139612_ekkuei4o3wr.css')
 
 app.mount('#app')
 

@@ -29,21 +29,20 @@
               <el-tag :disable-transitions="false" class="ml-4">
                 {{ item.name }}
               </el-tag>
-              <el-button text size="small" @click="handleUpdateCategory(item)">修改名称</el-button>
+              <el-button text  @click="handleUpdateCategory(item)">修改名称</el-button>
             </div>
             <el-input
                 v-if="inputVisible"
                 ref="InputRef"
                 v-model="newCategory"
                 class="w-20"
-                size="small"
                 @keyup.enter="handleInputConfirm"
                 @blur="handleInputConfirm"
                 maxlength="4"
                 show-word-limit
                 type="text"
             />
-            <el-button v-else class="button-new-tag" size="small" @click="showInput">
+            <el-button v-else class="button-new-tag" @click="showInput">
               + 添加新分类
             </el-button>
           </div>
