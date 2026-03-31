@@ -103,11 +103,12 @@ import { AddIcon, SearchIcon, Edit2Icon, BrowseIcon, Delete1Icon } from 'tdesign
 import {fetchCategoryList} from "../../common/ProductPage/categoryService.js";
 import ProductTable from "../components/ProductTable.vue";
 import AddProduct from "../components/AddProduct.vue";
-import { useRouter } from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import { Search } from '@element-plus/icons-vue'
 
 // 初始化路由
 const router = useRouter()
+const route = useRoute()
 
 const iconUrl = inject('iconUrl')
 
@@ -135,8 +136,14 @@ const dropdownOptions = [
 
 onMounted(async () => {
   categoryList.value = await fetchCategoryList()
+
   searchName.value = ""
   searchCode.value = ""
+
+  console.log(route.query.add)
+  if (route.query.add !== undefined) {
+    openDialog()
+  }
 })
 
 // 弹窗

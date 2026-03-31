@@ -136,13 +136,14 @@
 
 <script setup>
 import { ref, onMounted, inject,nextTick } from 'vue'
-import { useRouter } from "vue-router"
+import {useRoute, useRouter} from "vue-router"
 import {  Search } from '@element-plus/icons-vue'
 import {fetchAllOrders, fetchOrderCount, updateOrderStatus} from "../../common/OrderPage/orderService.js"
 import OrderTable from "../components/OrderTable.vue"
 import {useOrderPdfStore} from "../../../stores/orderPdfStore.js";
 
 const router = useRouter()
+const route = useRoute()
 const iconUrl = inject('iconUrl')
 
 const currentPageSize = ref(10)
@@ -418,10 +419,16 @@ const goToPdfPage = () => {
 
 
 onMounted(async () => {
-  const promises = stats.value.map(item => fetchOrderCount(item.status))
-  const results = await Promise.all(promises)
-  results.forEach((count, idx) => stats.value[idx].value = count)
-  await getAllOrderList()
+  const results = await Promise.all(
+      stats.value.map(item => fetchOrderCount(item.status))
+  )
+
+  results.forEach((count, idx) => {
+    stats.value[idx].value = count
+  })
+
+  const status = route.query.status
+  await (status ? getOrderStatusList(status) : getAllOrderList())
 })
 </script>
 
