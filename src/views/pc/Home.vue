@@ -23,7 +23,7 @@
           <template #icon>
             <t-icon :name="item.icon" />
           </template>
-          {{ item.title }}
+          {{ item.label }}
         </t-menu-item>
       </t-menu>
     </t-aside>

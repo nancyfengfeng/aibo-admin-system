@@ -23,7 +23,6 @@ function buildCustomerFilter(filter={}){
             VIPLevel:{$eq: vip}
         }
     }
-    console.log(finalFilter)
     return finalFilter
 }
 
@@ -124,6 +123,30 @@ export async function fetchInviteCodeList(){
         // 把所有 inviteCode 提取成一个纯数组
         return data.records.map(item => item.inviteCode)
 
+    }catch (error) {
+        return []
+    }
+}
+
+export async function fetchCustomerByName(customerName){
+    try{
+        const {data} = await models.Customer.list({
+            filter:{
+                where:{
+                    storeName:{$search_ci:customerName},
+                }
+            },
+            select:{
+                storeName:true,
+                inviteCode:true,
+                phone:true,
+                region:true,
+                _id:true,
+                VIPLevel:true,
+            }
+        })
+        console.log(data)
+        return data.records
     }catch (error) {
         return []
     }

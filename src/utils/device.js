@@ -1,6 +1,9 @@
-// 仅判断是否是手机（iPhone / 安卓）
 export function isMobile() {
-    if (typeof navigator === 'undefined') return false;
-    const ua = navigator.userAgent.toLowerCase();
-    return /iphone|android/i.test(ua);
+    if (typeof navigator === 'undefined') return false
+    const ua = navigator.userAgent.toLowerCase()
+    return /iphone|ipad|android|mobile|ipod|ios/i.test(ua) || window.innerWidth <= 1024
+}
+
+export function clearForceMobile() {
+    sessionStorage.removeItem('forceMobile')
 }

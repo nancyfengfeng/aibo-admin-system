@@ -3,8 +3,8 @@ import App from './App.vue'
 import router from './router'
 import { IconFont } from 'tdesign-icons-vue-next';
 import 'tdesign-vue-next/es/style/index.css';
+import 'tdesign-mobile-vue/es/style/index.css';
 import './main.css'
-import '@/assets/theme.css'
 import { createPinia } from 'pinia'
 
 const app = createApp(App)

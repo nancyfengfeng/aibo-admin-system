@@ -1,38 +1,50 @@
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { isMobile } from '@/utils/device'
 
-// 菜单公共逻辑（电脑 + 手机 通用）
 export function useMenu() {
     const router = useRouter()
     const route = useRoute()
 
-    const menuList = ref([
-        { title: '首页', path: '/', icon: 'home', el_icon: 'HomeFilled' },
-        { title: '商品管理', path: '/product', icon: 'cardmembership', el_icon: 'GoodsFilled' },
-        { title: '订单管理', path: '/order', icon: 'cart', el_icon: 'ShoppingCartFull' },
-        { title: '客户管理', path: '/customer', icon: 'user', el_icon: 'UserFilled' },
-        { title: '小程序管理', path: '/setting', icon: 'logo-miniprogram', el_icon: 'Setting' }
-    ])
+    // 强制判断：当前路径是不是 mobile 开头
+    const isInMobileSite = computed(() => {
+        return route.path.startsWith('/mobile')
+    })
 
-    // 先给个默认值
-    const activeMenu = ref('/')
+    // ==============================
+    // 🔥 手机端只显示：首页、订单、客户
+    // 🔥 自动隐藏：商品、设置
+    // ==============================
+    const menuList = computed(() => {
+        const baseMenu = [
+            { label: '首页', path: isInMobileSite.value ? '/mobile' : '/', icon: 'home' },
+            { label: '订单', path: isInMobileSite.value ? '/mobile/order' : '/order', icon: 'cart' },
+            { label: '客户', path: isInMobileSite.value ? '/mobile/customer' : '/customer', icon: 'user' },
+        ]
 
-    // 🔥 修复：等页面挂载后再获取路由
+        // PC 端才显示全部菜单（可选）
+        if (!isInMobileSite.value) {
+            baseMenu.splice(1, 0,
+                { label: '商品', path: '/product', icon: 'cardmembership' }
+            )
+            baseMenu.push({ label: '设置', path: '/setting', icon: 'setting' })
+        }
+
+        return baseMenu
+    })
+
+    const activeMenu = ref('')
+
     onMounted(() => {
         activeMenu.value = route.path
     })
 
-    // 监听路由变化（安全写法）
-    watch(
-        () => route.path,
-        (path) => {
-            if (path) activeMenu.value = path
-        }
-    )
+    watch(() => route.path, (path) => {
+        activeMenu.value = path
+    })
 
     const handleMenuChange = (val) => {
         router.push(val)
-        activeMenu.value = val
     }
 
     return {

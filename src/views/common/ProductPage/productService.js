@@ -28,7 +28,7 @@ function buildProductFilter(filter = {}) {
 
         // 编号搜索
         if (restFilter.code) {
-            orArr.push({ code: { $search: restFilter.code } });
+            orArr.push({ code: { $search_ci: restFilter.code } });
         }
 
         if (orArr.length > 0) {
@@ -48,7 +48,6 @@ function buildProductFilter(filter = {}) {
             },
         };
     }
-
     return finalFilter;
 }
 
@@ -198,7 +197,6 @@ export async function fetchProductShownSku(spuId){
 
 export async function formattedProductData(product,shownSkuId){
     const data = JSON.parse(JSON.stringify(product))
-    console.log("formattedProductData",data)
     const skus = data.skus.map(sku => ({ _id: sku._id }))
     const category = {_id:data.category._id}
     const tags = {_id:data.tags._id}
@@ -261,5 +259,59 @@ export async function addProduct(productData) {
             success: false,
             data: []
         }
+    }
+}
+
+
+export async function fetchProductBySkuCode(skuCode) {
+    try {
+        const { data } = await models.SKU.list({
+            filter: {
+                where: {
+                    skuCode: { $search_ci: skuCode }
+                }
+            },
+            select: {
+                skuCode: true,
+                attributes: true,
+                vip_price: true,
+                price: true,
+                product_sku: {
+                    name: true,
+                    images: true,
+                    _id: true,
+                }
+            }
+        })
+
+        // 1. 先格式化字段
+        let formattedList = data.records.map(item => {
+            return {
+                skuCode: item.skuCode,
+                attributes: item.attributes,
+                vip_price: item.vip_price,
+                price: item.price,
+                productName: item.product_sku?.name || '',
+                productId: item.product_sku?._id || '',
+                // 只取第一张图！没有就空数组
+                images: item.product_sku?.images?.[0] ? [item.product_sku.images[0]] : []
+            }
+        })
+
+        // 2. 格式化图片（只会格式化第一张）
+        formattedList = await formatProductImages(formattedList)
+
+        // 3. 最后再处理：直接把第一张图拿出来，变成 imageUrl 字段
+        const finalList = formattedList.map(item => ({
+            ...item,
+            // 直接取第一张图的 URL，没有就空字符串 ✅
+            imageUrl: item.images?.[0]?.url || ''
+        }))
+
+        return finalList
+
+    } catch (err) {
+        console.error(err)
+        return []
     }
 }

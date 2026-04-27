@@ -317,7 +317,8 @@ const confirmUpdate = async () => {
     }
   } else if (status === 3) {
     // 已收款
-    statusData = {order_status: '4',
+    statusData = {
+      order_status: '4',
       pay_status: true,
       pay_type: [payType], // 直接传 "1","2","3","4"
       pay_time: timestamp
@@ -387,7 +388,7 @@ const getOrderStatusList = async (status) => {
   try {
     const filter = status ? { status } : {}
     currentPageNum.value = 1
-    const res = await fetchAllOrders(currentPageSize.value, 1, filter)
+    const res = await fetchAllOrders(currentPageSize.value, currentPageNum.value, filter)
     orderList.value = res.result
   } catch (err) {
     console.error(err)

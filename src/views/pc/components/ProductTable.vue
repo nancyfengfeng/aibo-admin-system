@@ -41,21 +41,56 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="VIP价格">
-                  <el-table-column label="VIP-1" width="150"><template #default="scope">
-                    <el-input v-model="scope.row.vip_price[0].vip1" style="width: 100px" :formatter="(v) => `₡ ${v}`" :parser="(v) => v.replace(/₡|,/g,'')"/>
-                  </template></el-table-column>
-                  <el-table-column label="VIP-2" width="150"><template #default="scope">
-                    <el-input v-model="scope.row.vip_price[0].vip2" style="width: 100px" :formatter="(v) => `₡ ${v}`" :parser="(v) => v.replace(/₡|,/g,'')"/>
-                  </template></el-table-column>
-                  <el-table-column label="VIP-3" width="150"><template #default="scope">
-                    <el-input v-model="scope.row.vip_price[0].vip3" style="width: 100px" :formatter="(v) => `₡ ${v}`" :parser="(v) => v.replace(/₡|,/g,'')"/>
-                  </template></el-table-column>
-                  <el-table-column label="VIP-4" width="150"><template #default="scope">
-                    <el-input v-model="scope.row.vip_price[0].vip4" style="width: 100px" :formatter="(v) => `₡ ${v}`" :parser="(v) => v.replace(/₡|,/g,'')"/>
-                  </template></el-table-column>
-                  <el-table-column label="VIP-5" width="150"><template #default="scope">
-                    <el-input v-model="scope.row.vip_price[0].vip5" style="width: 100px" :formatter="(v) => `₡ ${v}`" :parser="(v) => v.replace(/₡|,/g,'')"/>
-                  </template></el-table-column>
+                  <el-table-column label="VIP-1" width="150">
+                    <template #default="scope">
+                      <el-input
+                          v-model="scope.row.vip_price[0].vip1"
+                          style="width: 100px"
+                          :formatter="(value) => `₡ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+                          :parser="(value) => value.replace(/₡\s?|,/g, '')"
+                      />
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="VIP-2" width="150">
+                    <template #default="scope">
+                      <el-input
+                          v-model="scope.row.vip_price[0].vip2"
+                          style="width: 100px"
+                          :formatter="(value) => `₡ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+                          :parser="(value) => value.replace(/₡\s?|,/g, '')"
+                      />
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="VIP-3" width="150">
+                    <template #default="scope">
+                      <el-input
+                          v-model="scope.row.vip_price[0].vip3"
+                          style="width: 100px"
+                          :formatter="(value) => `₡ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+                          :parser="(value) => value.replace(/₡\s?|,/g, '')"
+                      />
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="VIP-4" width="150">
+                    <template #default="scope">
+                      <el-input
+                          v-model="scope.row.vip_price[0].vip4"
+                          style="width: 100px"
+                          :formatter="(value) => `₡ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+                          :parser="(value) => value.replace(/₡\s?|,/g, '')"
+                      />
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="VIP-5" width="150">
+                    <template #default="scope">
+                      <el-input
+                          v-model="scope.row.vip_price[0].vip5"
+                          style="width: 100px"
+                          :formatter="(value) => `₡ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+                          :parser="(value) => value.replace(/₡\s?|,/g, '')"
+                      />
+                    </template>
+                  </el-table-column>
                 </el-table-column>
                 <el-table-column label="操作" width="60" fixed="right">
                   <template #default="scope">
@@ -161,6 +196,7 @@ const handleSaveSku = async (row) => {
   const loading = ElLoading.service({ text: '保存中...' })
   try {
     const sku = JSON.parse(JSON.stringify(row))
+    console.log(sku)
     const skuID = sku._id
     delete sku._id
     const skuRes = await updateSku(skuID, sku)

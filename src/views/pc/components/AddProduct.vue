@@ -572,7 +572,6 @@ const updateFormDataSku = (skuId, sku, isNew = false) => {
       const newSkus = [...props.formData.skus]
       newSkus[index] = { ...newSkus[index], ...sku } // 替换对象
       props.formData.skus = newSkus
-      console.log('编辑 SKU，索引:', index)
     }
   }
 }

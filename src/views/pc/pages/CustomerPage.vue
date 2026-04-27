@@ -227,7 +227,7 @@ import {
   fetchAllCustomers,
   updateCustomerDetail
 } from "../../common/CustomerPage/customerService.js";
-import AddCustomer from "../components/AddCustomer.vue";
+import AddCustomer from "../../../components/AddCustomer.vue";
 
 const iconUrl = inject('iconUrl')
 
@@ -400,7 +400,6 @@ const getCustomerList = async (filter={}) => {
   const loading = ElLoading.service({ text: '加载中...' })
   try {
     const res = await fetchAllCustomers(currentPageSize.value, currentPageNum.value, filter)
-    console.log(res.result)
     customerList.value = res.result
     OrderTotal.value = res.total
   } catch (err) {

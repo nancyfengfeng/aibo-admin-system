@@ -7,7 +7,7 @@
       @close="handleClose"
   >
     <el-form ref="formRef" :model="localForm" :rules="formRules" label-width="0px">
-      <el-descriptions border :column="1">
+      <el-descriptions border :column="1" label-width="100" size="large">
 
         <el-descriptions-item label="店铺名">
           <el-form-item prop="storeName" class="no-form-item-space">
@@ -67,22 +67,22 @@
             <div class="flex">
               <div class="grid grid-cols-1 gap-2">
                 <el-input
-                    v-model="localForm.storeLocation.geopoint.coordinates[0]"
-                    placeholder="请输入经度 (Longitude)"
-                >
-                  <template #prepend>
-                    <div style="width: 100px">
-                      经度 (Longitude)
-                    </div>
-                  </template>
-                </el-input>
-                <el-input
                     v-model="localForm.storeLocation.geopoint.coordinates[1]"
                     placeholder="请输入纬度 (Latitude)"
                 >
                   <template #prepend>
                     <div style="width: 100px">
                       纬度 (Latitude)
+                    </div>
+                  </template>
+                </el-input>
+                <el-input
+                    v-model="localForm.storeLocation.geopoint.coordinates[0]"
+                    placeholder="请输入经度 (Longitude)"
+                >
+                  <template #prepend>
+                    <div style="width: 100px">
+                      经度 (Longitude)
                     </div>
                   </template>
                 </el-input>
@@ -94,6 +94,13 @@
                     :disabled="!hasCoordinates(localForm.storeLocation)"
                 >
                   查看地图
+                </el-button>
+                <el-button
+                    link
+                    type="success"
+                    @click="getCurrentLocation"
+                >
+                  获取当前位置
                 </el-button>
               </div>
             </div>
@@ -147,7 +154,7 @@
 <script setup>
 import { ref, reactive, watch, nextTick,onMounted } from 'vue'
 import { CircleCheckFilled, CircleCloseFilled} from "@element-plus/icons-vue";
-import {fetchInviteCodeList, updateWechatOpenId} from "../../common/CustomerPage/customerService.js";
+import {fetchInviteCodeList, updateWechatOpenId} from "../views/common/CustomerPage/customerService.js";
 
 const props = defineProps({
   form: Object,        // 父组件传来的原始数据
@@ -317,6 +324,41 @@ const handleDeleteWechat = async (item) => {
   }finally {
     loading.close()
   }
+}
+
+// 获取当前位置 → 自动填充经纬度
+const getCurrentLocation = () => {
+  // 先判断浏览器是否支持定位
+  if (!navigator.geolocation) {
+    ElMessage.error('您的浏览器不支持地理位置服务')
+    return
+  }
+
+  ElMessage.info('正在获取您的位置...')
+
+  navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // 经度
+        const lng = position.coords.longitude
+        // 纬度
+        const lat = position.coords.latitude
+
+        // 直接赋值到你的表单里（完全匹配你的代码）
+        localForm.storeLocation.geopoint.coordinates[0] = lng
+        localForm.storeLocation.geopoint.coordinates[1] = lat
+
+        ElMessage.success(`位置获取成功！`)
+      },
+      (err) => {
+        console.error('定位失败：', err)
+
+        if (err.code === 1) {
+          ElMessage.error('请允许位置权限后重试')
+        } else {
+          ElMessage.error('获取位置失败，请重试')
+        }
+      }
+  )
 }
 
 defineExpose({ openDialog })

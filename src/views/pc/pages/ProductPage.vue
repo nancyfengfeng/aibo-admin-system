@@ -140,7 +140,6 @@ onMounted(async () => {
   searchName.value = ""
   searchCode.value = ""
 
-  console.log(route.query.add)
   if (route.query.add !== undefined) {
     openDialog()
   }
